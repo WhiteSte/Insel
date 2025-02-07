@@ -1,0 +1,63 @@
+# my-dicom-app/docker-compose.yml
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mydicom_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_USER=testuser
+      - MYSQL_PASSWORD=testpass
+      - MYSQL_DATABASE=dicomdb
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: mydicom_backend
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mysql
+      - python-service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=testuser
+      - DB_PASS=testpass
+      - DB_NAME=dicomdb
+      - PYTHON_SERVICE_URL=http://python-service:5050
+    volumes:
+      - ./backend:/usr/src/app
+      - ./uploads:/uploads  # Shared volume for uploads
+
+
+  python-service:
+    build: ./python-service
+    container_name: mydicom_python
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./python-service:/usr/src/app
+      - ./uploads:/uploads
+
+
+  frontend:
+    build: ./frontend
+    container_name: mydicom_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+
+volumes:
+  db_data:

@@ -1,0 +1,4 @@
+pydicom
+Flask
+Pillow
+numpy
