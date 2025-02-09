@@ -36,8 +36,8 @@ const cors = require("cors");
   // Route to download a file
   app.get("/download/:id", async (req, res) => {
     try {
-      const { DicomFile } = require("./models");
-      const dicom = await DicomFile.findByPk(req.params.id);
+      const { FilesTable } = require('./models');
+      const dicom = await FilesTable.findByPk(req.params.id);
       if (!dicom) return res.status(404).send("Not found");
       res.download(dicom.filePath);
     } catch (err) {

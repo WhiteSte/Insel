@@ -39,49 +39,62 @@ const DicomTable = () => {
         fetchFiles();
     }, []);
 
-    // 2) File upload logic (optional, if your backend supports it)
-    const handleFileChange = (e) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0]);
-        }
-    };
+ const handleDrop = (e) => {
+     e.preventDefault();
+     if (e.dataTransfer.files.length > 0) {
+         const droppedFile = e.dataTransfer.files[0];
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setFile(e.dataTransfer.files[0]);
-    };
+         // Check if it's a valid DICOM file (optional)
+         if (!droppedFile.name.toLowerCase().endsWith('.dcm')) {
+             console.error('Invalid file type');
+             return;
+         }
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-    };
+         setFile(droppedFile);
+     }
+ };
+
+ const handleDragOver = (e) => {
+     e.preventDefault();
+     e.dataTransfer.dropEffect = 'copy'; // Ensure the cursor shows copy
+ };
+
+ const handleFileChange = (e) => {
+     if (e.target.files && e.target.files.length > 0) {
+         setFile(e.target.files[0]);
+     }
+ };
 
     // This calls a REST endpoint `/upload`, then a GraphQL mutation (as in your older setup).
     // Update to match how you create new FilesTable entries in your new schema.
-    const handleUpload = async () => {
-        if (!file) return;
-        try {
-            // 1) Upload to /upload
-            const formData = new FormData();
-            formData.append('dicomFile', file);
-            const res = await axios.post(`${backendUrl}/upload`, formData);
-            const { fileName } = res.data;
+  const handleUpload = async () => {
+      if (!file) {
+          console.error('No file selected');
+          return;
+      }
 
-            // 2) If your backend has a new GraphQL mutation for creating a file,
-            //    call it here. Example:
-            const mutation = `
-  mutation {
-    uploadDicom(fileName: "${fileName}")
-  }
-`;
-            await axios.post(graphQLUrl, { query: mutation });
+      try {
+          const formData = new FormData();
+          formData.append('dicomFile', file);
 
-            // Refresh the list
-            // setFile(null);
-            fetchFiles();
-        } catch (error) {
-            console.error('Upload error', error);
-        }
-    };
+          const res = await axios.post(`${backendUrl}/upload`, formData);
+          const { fileName } = res.data;
+
+          // GraphQL mutation for file upload
+          const mutation = `
+        mutation {
+            uploadDicom(fileName: "${fileName}")
+        }`;
+
+          await axios.post(graphQLUrl, { query: mutation });
+
+          // Clear file selection and refresh list
+          setFile(null);
+          fetchFiles();
+      } catch (error) {
+          console.error('Upload error', error);
+      }
+  };
 
     // 3) Download / Preview logic (assuming your backend endpoints remain the same)
     const handleDownload = (idFile) => {
@@ -104,9 +117,10 @@ const DicomTable = () => {
                     padding: '20px',
                     marginBottom: '10px',
                     textAlign: 'center',
+                    backgroundColor: file ? '#e6f7ff' : 'transparent',
                 }}
             >
-                Drag &amp; Drop your DICOM file here
+                {file ? `File selected: ${file.name}` : 'Drag & Drop your DICOM file here'}
             </Box>
 
             {/* Traditional file input + Upload button */}

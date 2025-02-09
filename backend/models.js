@@ -22,6 +22,10 @@ const PatientTable = sequelize.define(
             type: DataTypes.STRING,
             primaryKey: true,
         },
+        BirthDate:{
+          type: DataTypes.STRING,
+
+        },
         Name: {
             type: DataTypes.STRING,
         }
@@ -83,19 +87,19 @@ const SeriesTable = sequelize.define(
         },
         idPatient: {
             type: DataTypes.STRING,
-            allowNull: false,
+            primaryKey: true,
         },
         idStudy: {
             type: DataTypes.STRING,
-            allowNull: false,
+            primaryKey: true,
         },
         idModality: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            primaryKey: true,
         },
         SeriesName: {
             type: DataTypes.STRING,
-        }
+        },
     },
     {
         tableName: 'SeriesTable',

@@ -68,10 +68,10 @@ def convert_dicom(filepath, output_type="json", with_metadata=False):
         SeriesNumber = getDicomValue(ds, "SeriesNumber")
         NumberOfFrames = getDicomValue(ds, "NumberOfFrames")
         StudyDescription = getDicomValue(ds, "StudyDescription")
-        PatientBirthDate = getDicomValue(ds, "PatientBirthDate")
         PatientID = getDicomValue(ds, "PatientID")
         SeriesInstanceUID = getDicomValue(ds, "SeriesInstanceUID")
         StudyInstanceUID = getDicomValue(ds, "StudyInstanceUID")
+        PatientBirthDate = getDicomValue(ds, "PatientBirthDate")
         output_json = {
             "slices": [
                 {
@@ -90,10 +90,10 @@ def convert_dicom(filepath, output_type="json", with_metadata=False):
             "Modality": Modality,
             "SeriesDescription": SeriesDescription,
             "PatientName": PatientName,
+            "PatientBirthDate": PatientBirthDate,
             "PatientID": PatientID,
             "SeriesInstanceUID": SeriesInstanceUID,
             "StudyInstanceUID": StudyInstanceUID,
-            "PatientBirthDate": PatientBirthDate,
             "StudyDate": StudyDate,
             "StudyTime": StudyTime,
             "SliceThickness": SliceThickness,
